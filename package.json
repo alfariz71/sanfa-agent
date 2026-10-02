@@ -1,0 +1,15 @@
+{
+  "name": "sanfa-agent",
+  "version": "1.0.0",
+  "description": "Sanfa Agent - Self-hosted AI Agent Web & Desktop Platform",
+  "main": "server.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs",
+    "desktop": "electron ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^31.7.7"
+  }
+}

@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sanfa">
+<meta name="theme-color" content="#110a06">
+<title>Sanfa Agent</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=8.0">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+
+<div class="app">
+  <div class="sidebar-overlay"></div>
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand-lockup">
+        <img src="icon.png" alt="Sanfa" class="brand-logo-img" />
+        <div>
+          <div class="sidebar-logo">Sanfa<span>.</span></div>
+          <div class="brand-subtitle">PRIVATE INTELLIGENCE</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-new-chat" id="btn-new-chat-sidebar">
+      <span class="button-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </span>
+      <span>New chat</span>
+    </button>
+
+    <!-- Dual Tab Switcher -->
+    <div class="sidebar-tabs">
+      <button class="sidebar-tab active" data-tab="chats" id="sidebar-tab-chats">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Chats
+      </button>
+      <button class="sidebar-tab" data-tab="projects" id="sidebar-tab-projects">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Projects
+      </button>
+    </div>
+
+    <!-- Panel: Chats -->
+    <div class="sidebar-panel" id="panel-chats">
+      <div class="chat-history" id="chat-history"></div>
+    </div>
+
+    <!-- Panel: Projects -->
+    <div class="sidebar-panel hidden" id="panel-projects">
+      <div class="project-panel-topbar">
+        <span class="project-panel-heading">Projects</span>
+        <div class="project-panel-actions">
+          <button class="btn-icon-proj-add" id="btn-new-project" title="Add Project (Pilih Folder)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+              <line x1="12" y1="11" x2="12" y2="17"/>
+              <line x1="9" y1="14" x2="15" y2="14"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="project-list" id="project-list">
+        <div class="chat-history-empty">Memuat project...</div>
+      </div>
+    </div>
+
+
+    <hr class="sidebar-divider">
+
+    <div class="system-status-block" id="system-status-block">
+      <div class="status-header-row">
+        <span class="status-machine-label" id="status-machine-label">
+          <svg class="machine-icon-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+          <span id="status-machine-name">Laptop Anda</span>
+        </span>
+        <span class="status-val status-val-green" id="status-machine-badge" title="Klik untuk info Sanfa Bridge & tes ping"><span class="badge-pulse-dot"></span>Local Bridge</span>
+      </div>
+      <div class="status-row" id="row-status-ram">
+        <span>RAM</span>
+        <span class="status-val" id="status-ram">— GB</span>
+      </div>
+      <div class="status-row" id="row-status-temp" style="display:none;">
+        <span>Temp</span>
+        <span class="status-val" id="status-temp" title="CPU / GPU Temp">—°C</span>
+      </div>
+      <div class="status-row" id="row-status-bat">
+        <span>Battery</span>
+        <span class="status-val" id="status-bat">—%</span>
+      </div>
+      <div class="status-row" id="row-status-server-only" style="display:none;">
+        <span>Server</span>
+        <span class="status-val status-val-green">🟢 Online</span>
+      </div>
+    </div>
+
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-bottom-item" id="btn-open-settings">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/>
+        </svg>
+        Settings
+      </div>
+      <div class="sidebar-user-row">
+        <div class="sidebar-bottom-item" id="btn-open-profile">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span id="sidebar-user-name">Ikhsan Fadhilah</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== Create Project & Folder Explorer Modal (Workspace Style) ===== -->
+  <div class="modal-overlay" id="create-project-modal" style="display:none;">
+    <div class="modal-panel create-project-modal-panel">
+      <div class="modal-header">
+        <span class="create-project-modal-title">Create Project</span>
+        <button class="modal-close-btn" id="close-create-project" aria-label="Tutup"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+
+      <!-- Step 1: Select Folder Prompt (Matches Sanfa Style) -->
+      <div id="project-prompt-view" class="create-project-body">
+        <div class="create-project-subtitle">Select Folder(s)</div>
+        
+        <button class="btn-add-folder-big" id="btn-trigger-add-folder">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Add Folder
+        </button>
+
+        <div id="selected-folder-badge-wrap" style="display:none;" class="selected-folder-badge-wrap">
+          <div class="selected-folder-badge">
+            <span class="folder-badge-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f7b06d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
+            <div class="folder-badge-info">
+              <span class="folder-badge-name" id="badge-folder-name">CONTENT</span>
+              <span class="folder-badge-path" id="badge-folder-path">G:\CONTENT</span>
+            </div>
+            <button class="folder-badge-clear" id="badge-folder-clear" title="Pilih folder lain"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+
+          <div style="margin-top:14px;">
+            <label class="modal-label">Nama Project (opsional ganti)</label>
+            <input type="text" id="final-project-name" class="modal-input" placeholder="Nama project..." />
+          </div>
+
+          <div style="display:flex;gap:8px;margin-top:16px;">
+            <button class="btn-primary-action" id="btn-confirm-create-project" style="flex:1;">Create Project</button>
+          </div>
+        </div>
+
+        <div class="create-project-footer" id="project-prompt-footer">
+          <button class="btn-skip-project" id="btn-skip-project">Cancel</button>
+        </div>
+        <div id="create-project-error" style="color:#f08282;font-size:12px;margin-top:8px;display:none;"></div>
+      </div>
+
+      <!-- Step 2: Interactive Windows-Style Folder Picker (Matches "Open workspace" Dialog) -->
+      <div id="project-explorer-view" class="folder-explorer-view" style="display:none;">
+        <!-- Address Bar with Breadcrumbs & Up Button -->
+        <div class="explorer-address-bar">
+          <button class="explorer-nav-btn" id="explorer-btn-up" title="Up one folder">↑</button>
+          <div class="explorer-breadcrumbs" id="explorer-breadcrumbs">
+            <span class="crumb" data-path="">This PC</span>
+          </div>
+          <button class="explorer-refresh-btn" id="explorer-btn-refresh" title="Refresh">↻</button>
+        </div>
+
+        <!-- Quick Drive Selector Pills (Acer C:, D:, Future E:, GAME F:, G:) -->
+        <div class="explorer-drives-row" id="explorer-drives-row"></div>
+
+        <!-- Folder List Grid (Click to open, double click or select to pick) -->
+        <div class="explorer-list-container" id="explorer-list-container">
+          <div class="explorer-loading">Memuat daftar folder...</div>
+        </div>
+
+        <!-- Selection Footer (Matches: Folder: [ G:\CONTENT ] [ Select Folder ] [ Cancel ]) -->
+        <div class="explorer-footer">
+          <div class="explorer-selection-row">
+            <span class="explorer-label">Folder:</span>
+            <input type="text" class="explorer-selected-input" id="explorer-selected-input" readonly placeholder="Pilih folder di atas..." />
+          </div>
+          <div class="explorer-actions-row">
+            <button class="btn-native-win-picker" id="btn-native-win-picker" title="Buka dialog File Explorer Windows bawaan laptop">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              Explorer Windows
+            </button>
+            <div style="display:flex;gap:8px;margin-left:auto;">
+              <button class="btn-explorer-back" id="btn-explorer-back-to-prompt">Back</button>
+              <button class="btn-explorer-confirm" id="btn-explorer-confirm" disabled>Select Folder</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Move Chat to Project Modal ===== -->
+  <div class="modal-overlay" id="move-chat-modal" style="display:none;">
+    <div class="modal-panel move-chat-modal-panel">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <svg class="modal-header-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+            <polyline points="12 11 15 14 12 17"/>
+            <line x1="9" y1="14" x2="15" y2="14"/>
+          </svg>
+          <span class="modal-title">Pindahkan Obrolan ke Project</span>
+        </div>
+        <button class="modal-close" id="close-move-chat" aria-label="Tutup"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="move-chat-body">
+        <div class="move-chat-info-banner">
+          <div class="move-chat-info-label">Obrolan yang dipilih:</div>
+          <div class="move-chat-info-title" id="move-chat-target-title">Judul Obrolan</div>
+        </div>
+
+        <div class="move-chat-section-label">PILIH WORKSPACE PROJECT TUJUAN:</div>
+        
+        <div class="move-chat-project-list" id="move-chat-project-list">
+          <div class="chat-history-empty">Memuat daftar project...</div>
+        </div>
+
+        <div class="move-chat-actions-bar">
+          <button type="button" class="btn-secondary-action" id="btn-create-proj-from-move">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            + Buat Project Baru
+          </button>
+          <button type="button" class="btn-detach-proj-action" id="btn-detach-proj-from-move" style="display:none;" title="Keluarkan percakapan ini dari project menjadi obrolan biasa">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Keluarkan dari Project
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Edit Project & Workspace Path Modal (Manus Style) ===== -->
+  <div class="modal-overlay" id="edit-project-modal" style="display:none;">
+    <div class="modal-panel edit-project-modal-panel">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <svg class="modal-header-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          <span class="modal-title">Pengaturan Project & Workspace Path</span>
+        </div>
+        <button class="modal-close" id="close-edit-project" aria-label="Tutup"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="edit-project-body">
+        <div class="edit-project-desc">
+          Konfigurasi direktori folder kerja lokal di laptop Anda ala <strong>Manus</strong>. Sanfa Agent akan membaca berkas, mengedit kode, dan menjalankan perintah terminal dengan direktori ini sebagai basis utama.
+        </div>
+
+        <div class="edit-project-form-group">
+          <label class="modal-label">Nama Project</label>
+          <input type="text" id="edit-proj-name" class="modal-input" placeholder="Contoh: CONTENT, Web App, Backend API..." />
+        </div>
+
+        <div class="edit-project-form-group">
+          <label class="modal-label">Direktori Folder Kerja Laptop (Workspace Path)</label>
+          <div class="edit-proj-path-wrap">
+            <input type="text" id="edit-proj-path" class="modal-input edit-proj-path-input" placeholder="Contoh: G:\CONTENT atau C:\AI\my-project" />
+            <div class="edit-proj-path-actions">
+              <button type="button" class="btn-edit-browse" id="btn-edit-proj-browse-folder" title="Buka Interactive Folder Picker">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                Pilih Folder
+              </button>
+              <button type="button" class="btn-edit-native" id="btn-edit-proj-native-explorer" title="Buka dialog Windows Explorer bawaan laptop">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                Explorer Windows
+              </button>
+            </div>
+          </div>
+          <div id="edit-proj-path-status" class="edit-proj-status-hint"></div>
+        </div>
+
+        <div id="edit-project-error" style="color:#f08282;font-size:12px;margin-top:6px;display:none;"></div>
+
+        <div class="edit-project-footer">
+          <button type="button" class="btn-secondary-action" id="btn-cancel-edit-project">Batal</button>
+          <button type="button" class="btn-primary-action" id="btn-save-project-settings">Simpan Perubahan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Toast Notifications Container ===== -->
+  <div class="toast-container" id="toast-container"></div>
+
+
+  <!-- ===== MAIN ===== -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="btn-sidebar-toggle icon-button" aria-label="Toggle sidebar" title="Menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="8" x2="20" y2="8"/>
+            <line x1="4" y1="16" x2="20" y2="16"/>
+          </svg>
+        </button>
+
+        <!-- Clickable model badge opens picker (matches SS 1) -->
+        <div class="model-badge" title="Klik untuk ganti model">
+          <span class="model-badge-dot">●</span>
+          <span class="model-name-text">santai-combo</span>
+        </div>
+
+        <span id="topbar-active-chat-title" style="display:none;"></span>
+
+        <!-- Active Project Indicator Pill -->
+        <div class="active-project-pill" id="topbar-project-pill" style="display:none;" title="Workspace Project Aktif">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span class="active-project-name" id="topbar-project-name">Project</span>
+          <button class="btn-exit-project" id="btn-exit-project" title="Keluar dari project (ke obrolan reguler)"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+
+        <!-- Remote Server Button (Khusus Owner) -->
+        <button type="button" class="btn-topbar-server" id="btn-topbar-server" title="Pantau & Remote Server Host (Khusus Owner)">
+          <svg class="btn-topbar-server-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+            <line x1="6" y1="6" x2="6.01" y2="6"/>
+            <line x1="6" y1="18" x2="6.01" y2="18"/>
+          </svg>
+          <span class="btn-topbar-server-label">Remote Server</span>
+          <span class="server-alert-dot" id="badge-server-alert"></span>
+        </button>
+
+        <!-- Roleplay / Persona Indicator Pill -->
+        <div class="active-persona-pill" id="topbar-persona-pill" title="Persona & Mode Roleplay">
+          <svg class="persona-pill-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+            <line x1="9" y1="9" x2="9.01" y2="9"/>
+            <line x1="15" y1="9" x2="15.01" y2="9"/>
+          </svg>
+          <span class="active-persona-name" id="topbar-persona-name" style="display:none;"></span>
+          <span class="persona-indicator-dot" id="topbar-persona-dot" style="display:none;"></span>
+        </div>
+
+        <button class="btn-topbar-artifact icon-button" id="btn-topbar-artifact" style="display:none;" title="Buka / Tutup Panel Artifact Samping">
+          <svg class="btn-topbar-artifact-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+          </svg>
+          <span class="btn-topbar-artifact-label">Artifact</span>
+        </button>
+
+        <!-- New Chat button topbar (pencil icon matches SS 1) -->
+        <button class="btn-icon btn-new-chat-topbar icon-button" aria-label="New chat" title="Obrolan Baru">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="chat-messages">
+      <div class="ambient ambient-one"></div>
+      <div class="ambient ambient-two"></div>
+      <div class="empty-state welcome-state">
+        <div class="welcome-watermark" aria-hidden="true">
+          <img src="icon.png" alt="" class="welcome-watermark-img" />
+        </div>
+        <h1 class="welcome-heading">Sanfa Agent</h1>
+        <p class="welcome-copy">AI multi-model dengan 9Router. Ngobrol, coding, kontrol laptop — semua dari sini.</p>
+        <div class="welcome-status"><span class="status-pulse"></span> Context Engine Ready <span class="status-divider"></span> Local Intelligence Online</div>
+        <div class="empty-state-suggestions prompt-grid">
+          <button type="button" class="suggestion-item prompt-card" onclick="document.getElementById('chat-input').value='Tolong carikan info terbaru di internet tentang ';document.getElementById('chat-input').focus();">
+            <span class="prompt-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+            <span class="prompt-card-text"><strong>Cari info terbaru di web</strong><small>Ekstraksi data & riset online terkini</small></span>
+            <svg class="prompt-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+          </button>
+          <button type="button" class="suggestion-item prompt-card" onclick="document.getElementById('chat-input').value='Bikinin gambar pemandangan kota neon cyberpunk 16:9';document.getElementById('chat-input').focus();">
+            <span class="prompt-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></span>
+            <span class="prompt-card-text"><strong>Generate gambar AI</strong><small>Google Imagen 3 studio visual</small></span>
+            <svg class="prompt-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+          </button>
+          <button type="button" class="suggestion-item prompt-card" onclick="document.getElementById('chat-input').value='Cek proses pemakan RAM dan status laptop sekarang';document.getElementById('chat-input').focus();">
+            <span class="prompt-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+            <span class="prompt-card-text"><strong>Cek status laptop &amp; RAM</strong><small>Pantau hardware &amp; proses sistem</small></span>
+            <svg class="prompt-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-wrapper">
+        <!-- Slash menu -->
+        <div class="slash-menu" id="slash-menu">
+          <div class="slash-menu-header">Commands</div>
+        </div>
+
+        <!-- Image preview bar -->
+        <div class="image-preview-bar" id="image-preview-bar" style="display:none;"></div>
+
+        <div class="input-box" id="input-box">
+          <input type="file" id="image-file-input" accept="image/*, .pdf, .txt, .csv, .json, .js, .ts, .py, .html, .css, .md, .log, .xml, .yaml, .yml, .sql, .sh, .bat, .env, .c, .cpp, .java, .docx" style="display:none;" />
+          <button class="btn-icon btn-attach-plus" id="btn-attach-image" title="Lampirkan File atau Gambar" aria-label="Lampirkan File atau Gambar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+          <textarea
+            id="chat-input"
+            placeholder="Tanya sesuatu..."
+            rows="1"
+            autocomplete="off"
+            spellcheck="false"
+          ></textarea>
+          <div class="input-actions">
+            <button class="btn-icon btn-voice-mic" title="Voice" aria-label="Voice">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+              </svg>
+            </button>
+            <button class="btn-send" aria-label="Send">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== ARTIFACT RIGHT SIDEBAR (Workspace Style) ===== -->
+  <aside class="artifact-sidebar" id="artifact-sidebar" aria-label="Artifact Panel">
+    <div class="artifact-sidebar-header">
+      <div class="artifact-tabs">
+        <button class="artifact-tab-btn active" id="art-side-tab-preview" data-tab="preview" title="Tampilan Langsung">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <span>Preview</span>
+        </button>
+        <button class="artifact-tab-btn" id="art-side-tab-code" data-tab="code" title="Lihat Sumber Kode">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"/>
+            <polyline points="8 6 2 12 8 18"/>
+          </svg>
+          <span>Code</span>
+        </button>
+      </div>
+      <div class="artifact-sidebar-header-right">
+        <button class="btn-artifact-action" id="art-side-refresh" title="Muat Ulang Aplikasi" aria-label="Refresh">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/>
+            <polyline points="21 3 21 8 16 8"/>
+          </svg>
+        </button>
+        <button class="btn-artifact-close" id="art-side-close" title="Tutup Panel Samping" aria-label="Tutup">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="artifact-sidebar-body" id="art-side-body">
+      <div class="artifact-sidebar-pane" id="art-side-preview-pane">
+        <iframe id="art-side-iframe" class="artifact-sidebar-iframe" sandbox="allow-scripts allow-modals allow-forms"></iframe>
+        <div id="art-side-diagram-container" class="artifact-sidebar-diagram-container" style="display:none;">
+          <div class="diagram-zoom-controls">
+            <button class="btn-diag-zoom" id="art-side-zoom-in" title="Perbesar" aria-label="Zoom In">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </button>
+            <button class="btn-diag-zoom" id="art-side-zoom-out" title="Perkecil" aria-label="Zoom Out">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+            </button>
+            <button class="btn-diag-zoom" id="art-side-zoom-reset" title="Reset Ukuran" aria-label="Reset">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg>
+            </button>
+          </div>
+          <div id="art-side-diagram-svg" class="diagram-svg-wrap"></div>
+        </div>
+      </div>
+      <div class="artifact-sidebar-pane" id="art-side-code-pane" style="display:none;">
+        <div class="artifact-code-header-bar">
+          <span class="artifact-code-title">Source Code</span>
+          <button class="btn-artifact-action btn-artifact-code-copy" id="art-side-copy" title="Salin Kode ke Clipboard" aria-label="Copy">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="13" height="13" x="9" y="9" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            <span>Salin</span>
+          </button>
+        </div>
+        <pre><code id="art-side-code-content"></code></pre>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- ===== PERSONA & ROLEPLAY MODAL ===== -->
+<div class="modal-overlay" id="persona-modal-overlay" style="display:none;">
+  <div class="modal-panel persona-modal-panel">
+    <div class="modal-header">
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg class="modal-header-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a9 9 0 0 0-9 9c0 4.97 4.03 9 9 9s9-4.03 9-9a9 9 0 0 0-9-9z"/>
+          <path d="M8 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+          <path d="M16 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+          <path d="M9 15c.83.67 1.83 1 3 1s2.17-.33 3-1"/>
+        </svg>
+        <span class="modal-title">Persona & Roleplay</span>
+      </div>
+      <button class="modal-close" id="persona-modal-close" aria-label="Close">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mode Roleplay Toggle Switch Bar -->
+    <div class="persona-toggle-bar">
+      <div class="persona-toggle-info">
+        <div class="persona-toggle-title">Mode Roleplay</div>
+        <div class="persona-toggle-sub">Bicara dengan dialek, kosakata, dan gaya karakter persona</div>
+      </div>
+      <label class="switch-toggle">
+        <input type="checkbox" id="persona-roleplay-toggle">
+        <span class="switch-slider"></span>
+      </label>
+    </div>
+
+    <!-- Triple Tab Switcher (Minimalist Segmented Control) -->
+    <div class="persona-tabs">
+      <button class="persona-tab active" id="tab-persona-list" data-tab="list">Tersimpan</button>
+      <button class="persona-tab" id="tab-persona-manual" data-tab="manual">Tulis Manual</button>
+      <button class="persona-tab" id="tab-persona-import" data-tab="import">Import WA (.txt)</button>
+    </div>
+
+    <!-- Tab 1: Saved Personas List -->
+    <div class="persona-tab-pane" id="pane-persona-list">
+      <div class="persona-list-scroll" id="persona-items-container">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Tab 2: Manual Persona Creation Form -->
+    <div class="persona-tab-pane" id="pane-persona-manual" style="display:none;">
+      <div class="manual-persona-form">
+        <div class="persona-form-group">
+          <label class="persona-form-label" for="manual-persona-name">Nama Persona</label>
+          <input type="text" id="manual-persona-name" class="persona-form-input" placeholder="Misal: Teman Curhat, Mas Joko, Bos Santai, dll." autocomplete="off">
+        </div>
+        <div class="persona-form-group">
+          <label class="persona-form-label" for="manual-persona-desc">Deskripsi Gaya Bicara & Dialek</label>
+          <textarea id="manual-persona-desc" class="persona-form-textarea" rows="4" placeholder="Jelaskan karakteristiknya: bahasa daerah (Jawa, Palembang, Sunda, dll), gaya ketikan, kata-kata yang sering dipakai, atau kepribadiannya..."></textarea>
+        </div>
+        <button type="button" class="btn-save-manual-persona" id="btn-save-manual-persona">
+          Simpan Persona
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab 3: WhatsApp Chat Cloner -->
+    <div class="persona-tab-pane" id="pane-persona-import" style="display:none;">
+      <!-- Step 1: Dropzone -->
+      <div class="wa-upload-zone" id="wa-upload-zone">
+        <svg class="wa-upload-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <line x1="9" y1="15" x2="15" y2="15"/>
+        </svg>
+        <div class="wa-upload-title">Pilih File Chat WhatsApp (.txt)</div>
+        <div class="wa-upload-sub">Ekspor chat tanpa media dari WhatsApp</div>
+        <input type="file" id="wa-file-input" accept=".txt" style="display:none;">
+        <button type="button" class="btn-select-wa-file" id="btn-select-wa-file">Pilih Berkas .txt</button>
+      </div>
+
+      <!-- Step 2: Participant selection (hidden until parsed) -->
+      <div class="wa-participants-section" id="wa-participants-section" style="display:none;">
+        <div class="wa-section-title">Pilih kontak yang ingin dikloning:</div>
+        <div class="wa-participants-list" id="wa-participants-list"></div>
+        <button type="button" class="btn-confirm-clone-wa" id="btn-confirm-clone-wa" disabled>
+          Kloning Gaya Bicara & Ingatan Otomatis
+        </button>
+      </div>
+
+      <!-- Loading state -->
+      <div class="wa-cloning-loading" id="wa-cloning-loading" style="display:none;">
+        <div class="wa-cloning-spinner"></div>
+        <div class="wa-cloning-status-text" id="wa-cloning-status-text">Menganalisis gaya chat, dialek, dan ingatan percakapan...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODEL PICKER MODAL ===== -->
+<div class="modal-overlay" id="model-modal-overlay">
+  <div class="modal-panel">
+    <div class="modal-header">
+      <span class="modal-title">Pilih Model</span>
+      <button class="modal-close" id="modal-close" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-search-wrap">
+      <input type="text" id="model-search" class="modal-search" placeholder="Cari model..." autocomplete="off" spellcheck="false">
+    </div>
+    <div class="modal-tabs" id="model-tabs">
+      <!-- tabs rendered by JS -->
+    </div>
+    <div class="model-list" id="model-list">
+      <div class="model-loading">Loading models from 9Router...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROFILE MODAL ===== -->
+<div class="modal-overlay" id="profile-modal-overlay">
+  <div class="modal-panel profile-modal-panel">
+    <div class="modal-header">
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span class="modal-title">Profil Pengguna</span>
+      </div>
+      <button class="modal-close" id="profile-modal-close" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="settings-body">
+      <div class="settings-group">
+        <div class="settings-group-title">IDENTITAS AKUN</div>
+        <div class="settings-card profile-card">
+          <div class="profile-avatar" id="profile-user-avatar">IF</div>
+          <div class="profile-info">
+            <div class="profile-name" id="profile-user-name">Ikhsan Fadhilah</div>
+            <div class="profile-role" id="profile-user-role">Pemilik Sistem</div>
+          </div>
+        </div>
+        <div class="settings-card" style="margin-top:8px;">
+          <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:8px;">Sapaan yang digunakan AI (contoh: <em>San, Dil, Bos, Kang Ikhsan</em>)</div>
+          <form id="form-update-nickname" style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="input-user-nickname" class="login-input" placeholder="Nama panggilan akrab..." autocomplete="off" style="flex:1;" />
+            <button type="submit" class="btn-settings-action" style="background:var(--accent);color:#fff;white-space:nowrap;padding:9px 14px;">&#128190; Simpan</button>
+          </form>
+          <div id="nickname-status-msg" style="display:none;margin-top:8px;font-size:12px;"></div>
+        </div>
+        <div style="margin-top:8px;display:flex;align-items:center;gap:8px;background:rgba(0,0,0,0.25);border:1px solid rgba(180,110,60,0.2);border-radius:8px;padding:8px 12px;">
+          <span style="font-size:11px;color:#a89f91;white-space:nowrap;">&#128273; Token:</span>
+          <code id="profile-bridge-token" style="flex:1;font-family:var(--font-mono);font-size:11px;color:#ffd8a8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">-</code>
+          <button type="button" id="btn-copy-profile-token" style="background:rgba(180,110,60,0.25);border:1px solid rgba(180,110,60,0.35);color:#ffd8a8;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">Salin</button>
+        </div>
+      </div>
+      <div class="settings-group">
+        <div class="settings-group-title">PERSONA AI</div>
+        <div class="settings-card">
+          <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:10px;">Pilih gaya bicara AI untuk akun kamu:</div>
+          <div class="persona-preset-grid" id="persona-preset-grid">
+            <button class="persona-preset-btn" data-preset="singkat"><span class="persona-preset-icon">&#9889;</span><span class="persona-preset-label">Singkat</span><span class="persona-preset-desc">Langsung ke inti</span></button>
+            <button class="persona-preset-btn active" data-preset="santai"><span class="persona-preset-icon">&#9749;</span><span class="persona-preset-label">Santai</span><span class="persona-preset-desc">Akrab &amp; luwes</span></button>
+            <button class="persona-preset-btn" data-preset="edukatif"><span class="persona-preset-icon">&#127891;</span><span class="persona-preset-label">Edukatif</span><span class="persona-preset-desc">Penjelasan detail</span></button>
+            <button class="persona-preset-btn" data-preset="formal"><span class="persona-preset-icon">&#128188;</span><span class="persona-preset-label">Formal</span><span class="persona-preset-desc">Baku &amp; profesional</span></button>
+          </div>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px;">
+            <div>
+              <label style="font-size:11px;color:#a89f91;font-weight:600;display:block;margin-bottom:4px;">TENTANG SAYA</label>
+              <textarea id="input-user-bio" class="login-input" rows="3" placeholder="Ceritakan tentang dirimu agar AI lebih paham konteksmu..." style="resize:vertical;min-height:60px;line-height:1.5;width:100%;box-sizing:border-box;"></textarea>
+            </div>
+            <div>
+              <label style="font-size:11px;color:#a89f91;font-weight:600;display:block;margin-bottom:4px;">INSTRUKSI KHUSUS UNTUK AI</label>
+              <textarea id="input-ai-instruction" class="login-input" rows="3" placeholder="Bagaimana kamu ingin AI merespons? (misal: selalu sertakan contoh kode lengkap)" style="resize:vertical;min-height:60px;line-height:1.5;width:100%;box-sizing:border-box;"></textarea>
+            </div>
+            <button type="button" id="btn-save-ai-persona" class="btn-settings-action" style="background:var(--accent);color:#fff;width:100%;padding:10px;">&#128190; Simpan Persona AI</button>
+            <div id="persona-status-msg" style="display:none;font-size:12px;text-align:center;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-group">
+        <div class="settings-card" style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Keluar dari Akun</div>
+            <div style="font-size:11.5px;color:var(--text-muted)">Akhiri sesi login di perangkat ini.</div>
+          </div>
+          <button class="btn-settings-action danger" id="btn-logout-profile" style="max-width:130px;">&#128682; Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SETTINGS MODAL ===== -->
+<div class="modal-overlay" id="settings-modal-overlay">
+  <div class="modal-panel settings-panel">
+    <div class="modal-header" style="flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 0 0 4.93 19.07M4.93 4.93A10 10 0 0 0 19.07 19.07"/></svg>
+        <span class="modal-title">Pengaturan</span>
+      </div>
+      <button class="modal-close" id="settings-modal-close" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="settings-tabs" style="flex-shrink:0;">
+      <button class="settings-tab-btn active" data-tab="about"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Tentang</button>
+      <button class="settings-tab-btn" data-tab="bridge"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Bridge</button>
+      <button class="settings-tab-btn" data-tab="history"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg> Riwayat</button>
+      <button class="settings-tab-btn owner-only" data-tab="users" style="display:none;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> User</button>
+      <button class="settings-tab-btn owner-only" data-tab="devices" style="display:none;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg> Device</button>
+    </div>
+    <div class="settings-body">
+      <div class="settings-pane active" id="settings-pane-about">
+        <div class="settings-group">
+          <div class="settings-group-title">TENTANG SANFA AGENT</div>
+          <div class="settings-card">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+              <img src="icon.png" alt="Sanfa Agent Logo" style="width:42px;height:42px;border-radius:10px;object-fit:cover;flex-shrink:0;box-shadow:0 3px 10px rgba(0,0,0,0.35);border:1px solid rgba(180,110,60,0.3);" />
+              <div><div style="font-size:14px;font-weight:700;color:var(--text-primary)">Sanfa Agent</div><div style="font-size:11.5px;color:var(--text-muted)">Sanfa Agent Core v2.0 &middot; Powered by 9Router AI Gateway</div></div>
+            </div>
+            <div style="font-size:12px;color:var(--text-muted);line-height:1.75;">Asisten AI personal yang berjalan di laptop lokal, terhubung ke luar melalui Cloudflare Tunnel. Bukan sekadar chatbot &mdash; Sanfa bisa menjalankan perintah terminal, membaca hardware, mengontrol mouse &amp; keyboard, menganalisis dokumen, mengkloning persona dari chat WhatsApp, dan mengingat konteks percakapan secara berkelanjutan.</div>
+          </div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title">STATUS SISTEM</div>
+          <div class="settings-card">
+            <div class="settings-row"><span>Sistem</span><span class="settings-val">Sanfa Agent Core (Local Autonomous Engine)</span></div>
+            <div class="settings-row"><span>9Router Gateway</span><span class="settings-val" style="color:#7ab87a">&#9679; Online (localhost:20128)</span></div>
+            <div class="settings-row"><span>Domain Publik</span><span class="settings-val"><a href="https://sanfaagent.my.id" target="_blank" style="color:#c9a87a;text-decoration:none;">sanfaagent.my.id &#8599;</a></span></div>
+            <div class="settings-row"><span>Model Aktif</span><span class="settings-val" id="settings-model-badge">-</span></div>
+          </div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title">PANDUAN PENGGUNAAN</div>
+          <div class="about-manual-card" id="btn-open-manual-book" role="button" tabindex="0">
+            <div class="about-manual-icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-weight:600;font-size:13px;color:var(--text-primary)">Buku Panduan Pengguna (Manual Book)</div>
+              <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">Panduan visual berpenunjuk: Perintah Slash (/), Pasang Bridge, &amp; Kloning WA</div>
+            </div>
+            <svg class="about-manual-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="settings-pane" id="settings-pane-bridge">
+    <!-- Status Card -->
+    <div class="bridge-status-card" id="bridge-status-card">
+      <div class="bridge-status-indicator-wrap">
+        <div class="bridge-large-dot" id="bridge-large-dot"></div>
+        <div>
+          <div class="bridge-status-title" id="bridge-status-title">Bridge Terputus (Offline)</div>
+          <div class="bridge-status-desc" id="bridge-status-desc">Hubungkan laptop kamu agar Sanfa bisa menjalankan perintah langsung di komputermu.</div>
+        </div>
+      </div>
+      <div class="bridge-connected-meta" id="bridge-connected-meta" style="display:none;">
+        <div class="bridge-meta-row"><span>Komputer:</span> <strong id="bridge-meta-hostname">—</strong></div>
+        <div class="bridge-meta-row"><span>Platform:</span> <span id="bridge-meta-platform">—</span></div>
+        <div class="bridge-meta-row"><span>Folder CWD:</span> <span id="bridge-meta-cwd" class="bridge-meta-mono">—</span></div>
+        <div class="bridge-test-row" style="margin-top:10px;display:flex;align-items:center;gap:10px;">
+          <button type="button" class="btn-bridge-test" id="btn-bridge-test"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;vertical-align:-1px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Test Ping Laptop</button>
+          <span class="bridge-test-feedback" id="bridge-test-feedback" style="font-size:0.75rem;color:#a89f91;"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Setup Guide — 3 Method Tabs -->
+    <div class="bridge-setup-section" id="bridge-setup-section">
+      <div class="bridge-setup-label">Pilih cara menghubungkan laptop kamu:</div>
+
+      <!-- Tab Nav -->
+      <div class="bridge-tab-nav" id="bridge-tab-nav">
+        <button class="bridge-tab-btn active" data-tab="terminal"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Terminal / CMD</button>
+        <button class="bridge-tab-btn" data-tab="zip"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>ZIP Portable</button>
+        <button class="bridge-tab-btn" data-tab="exe"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Desktop App</button>
+      </div>
+
+      <!-- Tab: Terminal / CMD -->
+      <div class="bridge-tab-content active" id="bridge-tab-terminal">
+        <div class="bridge-method-desc">Hubungkan laptop kamu lewat terminal dalam 3 langkah mudah:</div>
+
+        <div class="bridge-zip-steps">
+          <!-- 1. Cek Node.js -->
+          <div class="bridge-zip-step">
+            <span class="bridge-zip-num">1</span>
+            <div>
+              <div><strong>Cek apakah kamu memiliki Node.js?</strong></div>
+              <div class="bridge-code-box" style="margin-top:4px;">
+                <code id="bridge-check-node-code">node -v</code>
+                <button type="button" class="btn-copy-bridge-cmd" data-target="bridge-check-node-code" title="Salin Perintah">Salin</button>
+              </div>
+              <div class="bridge-step-subnote" style="margin-top:4px;">
+                Jika muncul versi (misal <code>v20.x.x</code>) &rarr; langsung ke no <strong>3</strong>. Jika belum ada &rarr; ikuti no <strong>2</strong>.
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Jika Belum Punya -->
+          <div class="bridge-zip-step">
+            <span class="bridge-zip-num">2</span>
+            <div>
+              <div><strong>Jika BELUM punya, pasang lewat ini:</strong></div>
+              <div class="bridge-code-box" style="margin-top:4px;">
+                <code id="bridge-install-node-code">winget install OpenJS.NodeJS.LTS</code>
+                <button type="button" class="btn-copy-bridge-cmd" data-target="bridge-install-node-code" title="Salin Perintah">Salin</button>
+              </div>
+              <div class="bridge-step-subnote" style="margin-top:4px;">
+                Atau download dari <a href="https://nodejs.org" target="_blank" rel="noopener" style="color:var(--accent,#f7b06d);text-decoration:underline;">nodejs.org &nearr;</a>. Selesai install, lanjut ke no <strong>3</strong>.
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Jika Sudah Punya -->
+          <div class="bridge-zip-step">
+            <span class="bridge-zip-num">3</span>
+            <div>
+              <div><strong>Jika SUDAH punya, jalankan ini (PILIH SALAH SATU):</strong></div>
+              
+              <div style="font-size:10.5px;color:#86efac;margin-top:6px;font-weight:600;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Opsi A — Auto-Start Tiap Laptop Nyala (Cukup 1x Jalan):</div>
+              <div class="bridge-code-box" style="margin-top:3px;">
+                <code id="bridge-ps1-startup-code">Memuat perintah...</code>
+                <button type="button" class="btn-copy-bridge-cmd" data-target="bridge-ps1-startup-code" title="Salin Perintah">Salin</button>
+              </div>
+
+              <div style="font-size:10.5px;color:#a89f91;margin-top:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px;"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Opsi B — PowerShell Biasa (Manual Sekali Pakai):</div>
+              <div class="bridge-code-box" style="margin-top:3px;">
+                <code id="bridge-ps1-code">Memuat perintah...</code>
+                <button type="button" class="btn-copy-bridge-cmd" data-target="bridge-ps1-code" title="Salin Perintah">Salin</button>
+              </div>
+
+              <div style="font-size:10.5px;color:#a89f91;margin-top:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:4px;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Opsi C — Command Prompt (CMD):</div>
+              <div class="bridge-code-box" style="margin-top:3px;">
+                <code id="bridge-command-code">Memuat perintah...</code>
+                <button type="button" class="btn-copy-bridge-cmd" id="btn-copy-bridge-cmd" data-target="bridge-command-code" title="Salin Perintah">Salin</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: ZIP Portable -->
+      <div class="bridge-tab-content" id="bridge-tab-zip">
+        <div class="bridge-method-desc">Paket ringan (~7 KB) — ekstrak &amp; double-klik. Tidak perlu install apapun selain Node.js.</div>
+        <div class="bridge-zip-steps">
+          <div class="bridge-zip-step">
+            <span class="bridge-zip-num">1</span>
+            <div>Download ZIP di bawah</div>
+          </div>
+          <div class="bridge-zip-step">
+            <span class="bridge-zip-num">2</span>
+            <div>Ekstrak ke folder mana saja di laptop</div>
+          </div>
+          <div class="bridge-zip-step">
+            <span class="bridge-zip-num">3</span>
+            <div>Double-klik <code>run-bridge.bat</code> (atau <code>install-bridge-startup.bat</code> agar auto-start tiap laptop nyala)</div>
+          </div>
+          <div class="bridge-zip-step">
+            <span class="bridge-zip-num">4</span>
+            <div>Masukkan token kamu saat diminta &rarr; Terhubung!</div>
+          </div>
+        </div>
+        <div class="bridge-btn-group" style="margin-top:14px;">
+          <a href="/download/cli" class="btn-bridge-download">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Sanfa-Bridge-CLI.zip (~7 KB)
+          </a>
+        </div>
+        <div class="bridge-extras-label" style="margin-top:14px;">File terpisah:</div>
+        <div class="bridge-btn-group bridge-btn-group-sm">
+          <a href="/scripts/run-bridge.bat" download="run-bridge.bat" class="btn-bridge-download-alt" title="CMD launcher dengan jendela hitam">run-bridge.bat</a>
+          <a href="/scripts/run-bridge-hidden.vbs" download="run-bridge-hidden.vbs" class="btn-bridge-download-alt" title="Background silent, tanpa popup CMD">run-bridge-hidden.vbs</a>
+          <a href="/scripts/install-bridge-startup.bat" download="install-bridge-startup.bat" class="btn-bridge-download-alt" title="Pasang ke Auto-Start Windows"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:3px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Auto-Start</a>
+          <a href="/scripts/sanfa-bridge.mjs" download="sanfa-bridge.mjs" class="btn-bridge-download-alt">sanfa-bridge.mjs</a>
+        </div>
+      </div>
+
+      <!-- Tab: Desktop App -->
+      <div class="bridge-tab-content" id="bridge-tab-exe">
+        <div class="bridge-method-desc">Installer aplikasi desktop Windows resmi (.exe) — praktis sekali klik, langsung pasang icon di Desktop &amp; Start Menu tanpa perlu ekstrak ZIP!</div>
+        <div class="bridge-zip-steps">
+          <div class="bridge-zip-step">
+            <span class="bridge-zip-num">1</span>
+            <div>Download file installer <code>Sanfa-Agent-Setup.exe</code> di bawah</div>
+          </div>
+          <div class="bridge-zip-step">
+            <span class="bridge-zip-num">2</span>
+            <div>Dobel-klik file installer untuk memasang (otomatis pasang shortcut bebas blokir di Desktop)</div>
+          </div>
+          <div class="bridge-zip-step">
+            <span class="bridge-zip-num">3</span>
+            <div>Buka Sanfa Agent &amp; login — Bridge otomatis aktif di background &check;</div>
+          </div>
+        </div>
+        <div class="bridge-btn-group" style="margin-top:14px;">
+          <a href="/download" class="btn-bridge-download">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Sanfa-Agent-Setup.exe (~89 MB)
+          </a>
+        </div>
+        <div class="bridge-node-check" style="margin-top:10px;">
+          <span class="bridge-note-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#f7b06d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-right:3px;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></span> Murni 1 file installer (.exe) resmi — tanpa ekstrak ZIP, tanpa install Node.js terpisah!
+        </div>
+      </div>
+
+      <!-- Universal Accordion: Cara Mematikan Auto-Start -->
+      <div class="bridge-accordion-wrap">
+        <button type="button" class="bridge-accordion-toggle" id="btn-toggle-bridge-uninstall" aria-expanded="false">
+          <span class="bridge-accordion-toggle-left">
+            <svg class="bridge-accordion-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+            </svg>
+            <span>Cara Mematikan Auto-Start</span>
+          </span>
+          <svg class="bridge-accordion-chevron" id="bridge-accordion-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+
+        <div class="bridge-accordion-body" id="bridge-uninstall-drawer" style="display:none;">
+          <!-- Content 1: Khusus Tab Terminal / CMD -->
+          <div id="bridge-uninstall-terminal" class="bridge-uninstall-pane">
+            <div class="bridge-uninstall-desc">Buka PowerShell di laptopmu lalu jalankan 1 perintah ini:</div>
+            <div class="bridge-code-box" style="margin-top:4px;">
+              <code id="bridge-uninstall-cmd">del "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\SanfaBridge.vbs" -Force -ErrorAction SilentlyContinue; Stop-Process -Name "node" -ErrorAction SilentlyContinue</code>
+              <button type="button" class="btn-copy-bridge-cmd" data-target="bridge-uninstall-cmd" title="Salin Perintah">Salin</button>
+            </div>
+            <div class="bridge-step-subnote" style="margin-top:4px;">Perintah ini akan langsung menghapus auto-start dan menghentikan background bridge di laptopmu.</div>
+          </div>
+
+          <!-- Content 2: Khusus Tab ZIP Portable -->
+          <div id="bridge-uninstall-zip" class="bridge-uninstall-pane" style="display:none;">
+            <div class="bridge-uninstall-desc">Cara mematikan auto-start pada paket ZIP Portable:</div>
+            <div class="bridge-exe-uninstall-steps" style="margin-top:4px;">
+              <div>1. Buka folder hasil ekstrak <strong>Sanfa-Bridge-CLI</strong> di laptopmu.</div>
+              <div>2. Cukup double-klik file <code>uninstall-bridge-startup.bat</code>.</div>
+              <div>3. Selesai! Auto-start langsung terhapus dan proses bridge otomatis berhenti.</div>
+            </div>
+          </div>
+
+          <!-- Content 3: Khusus Tab Desktop App -->
+          <div id="bridge-uninstall-exe" class="bridge-uninstall-pane" style="display:none;">
+            <div class="bridge-uninstall-desc">Cara mematikan auto-start pada aplikasi desktop:</div>
+            <div class="bridge-exe-uninstall-steps" style="margin-top:4px;">
+              <div>1. Buka <strong>Task Manager</strong> (tekan <code>Ctrl + Shift + Esc</code>) &rarr; pilih tab <strong>Startup</strong>.</div>
+              <div>2. Cari <strong>Sanfa Agent</strong> &rarr; klik kanan &rarr; pilih <strong>Disable</strong>.</div>
+              <div style="font-size:10.5px;color:#8c7868;margin-top:2px;">• Untuk keluar langsung: klik kanan ikon Sanfa di tray taskbar (kanan bawah) &rarr; <strong>Keluar</strong>.</div>
+            </div>
+          </div>
+
+          <!-- Note Universal di Bawahnya -->
+          <div class="bridge-uninstall-warning">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f7b06d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+            <span><em>Catatan: Mematikan auto-start ini akan membuat bridge harus diaktifkan secara manual saat ingin menghubungkan laptop.</em></span>
+          </div>
+        </div>
+      </div>
+    </div>
+      </div>
+      <div class="settings-pane" id="settings-pane-history">
+        <div class="settings-group">
+          <div class="settings-group-title">MANAJEMEN RIWAYAT</div>
+          <div class="settings-card">
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.5">Riwayat tersimpan terisolasi per akun. Hapus sesi aktif atau reset semua riwayat chat akun ini.</div>
+            <div class="settings-btn-row">
+              <button class="btn-settings-action" id="btn-clear-current-chat"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Bersihkan Chat Ini</button>
+              <button class="btn-settings-action danger" id="btn-clear-all-sessions"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Reset Semua Riwayat</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="settings-pane" id="settings-pane-users">
+        <div style="font-size:12px;color:var(--text-muted);line-height:1.5">Kelola akun sistem. <strong>Guest</strong> hanya bisa AI Chat.</div>
+        <div class="settings-group">
+          <div class="settings-group-title">TAMBAH AKUN</div>
+          <div class="settings-card">
+            <form id="form-create-user" class="form-create-user">
+              <div class="user-form-grid">
+                <div><label class="input-label">Username</label><input type="text" id="input-new-username" class="login-input" placeholder="contoh: budi" required autocomplete="off" /></div>
+                <div><label class="input-label">Password</label><input type="password" id="input-new-password" class="login-input" placeholder="password rahasia" required autocomplete="off" /></div>
+                <div><label class="input-label">Nama</label><input type="text" id="input-new-name" class="login-input" placeholder="contoh: Budi Santoso" autocomplete="off" /></div>
+                <div><label class="input-label">Role</label><select id="input-new-role" class="login-input" style="height:38px;"><option value="guest">Guest (AI Chat saja)</option><option value="owner">Owner (Akses Penuh)</option></select></div>
+              </div>
+              <div id="create-user-status" style="display:none;margin-top:8px;font-size:12px;"></div>
+              <button type="submit" class="btn-settings-action" style="margin-top:10px;background:var(--accent);color:#fff;width:100%;">+ Tambah Akun</button>
+            </form>
+          </div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title">DAFTAR PENGGUNA</div>
+          <div id="users-list-container" class="users-list-container"><div style="font-size:12px;color:var(--text-subtle)">Memuat...</div></div>
+        </div>
+      </div>
+      <div class="settings-pane" id="settings-pane-devices">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.4">Deteksi perangkat login &mdash; browser, OS, IP &amp; lokasi.</div>
+          <button class="btn-device-action" id="btn-refresh-devices" title="Refresh"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title">SESI AKTIF &amp; LOG LOGIN</div>
+          <div id="active-devices-container"><div style="font-size:12px;color:var(--text-subtle)">Memuat...</div></div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title">BLACKLIST (DIBLOKIR)</div>
+          <div id="blocked-devices-container"><div style="font-size:12px;color:var(--text-subtle)">Memuat...</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LOGIN OVERLAY ===== -->
+<div class="login-overlay" id="login-modal-overlay" style="display:none;">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-logo">Sanfa<span>.</span></div>
+      <div class="login-title">Sanfa Agent Portal</div>
+      <div class="login-subtitle">Masuk untuk mengakses kecerdasan & asisten sistem</div>
+    </div>
+    <form id="login-form" class="login-form">
+      <div class="login-field">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" class="login-input" placeholder="contoh: ikhsan" required autocomplete="username" />
+      </div>
+      <div class="login-field">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" class="login-input" placeholder="••••••••" required autocomplete="current-password" />
+      </div>
+      <div id="login-error" class="login-error" style="display:none;"></div>
+      <button type="submit" id="login-submit-btn" class="login-submit-btn">
+        <span>Masuk</span>
+      </button>
+      <div class="login-footer-hint">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f7b06d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Terenkripsi & diaudit oleh sistem keamanan Sanfa Agent.
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== BLOCKED SCREEN OVERLAY ===== -->
+<div class="blocked-screen-overlay" id="blocked-screen-overlay" style="display:none;">
+  <div class="blocked-card">
+    <div class="blocked-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div>
+    <h2 class="blocked-title">Akses Ditolak</h2>
+    <div class="blocked-badge">PERANGKAT ANDA DIBLOKIR</div>
+    <p class="blocked-desc" id="blocked-reason-text">
+      Perangkat Anda atau alamat IP ini telah diblokir secara permanen oleh Administrator Sistem.
+    </p>
+    <div class="blocked-meta" id="blocked-device-meta">
+      <!-- Info Device & IP -->
+    </div>
+    <div class="blocked-hint">
+      Jika Anda merasa ini adalah kekeliruan, silakan hubungi Administrator (Ikhsan Fadhilah).
+    </div>
+  </div>
+</div>
+
+<!-- ===== ARTIFACT MODAL / FULLSCREEN VIEWER ===== -->
+<div class="artifact-modal-overlay" id="artifact-modal-overlay" style="display:none;">
+  <div class="artifact-modal-panel">
+    <div class="artifact-modal-header">
+      <div class="artifact-modal-header-left">
+        <span class="artifact-badge" id="artifact-modal-badge">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+          </svg>
+          <span>ARTIFACT</span>
+        </span>
+        <span class="artifact-modal-title" id="artifact-modal-title">Live Preview</span>
+      </div>
+      <div class="artifact-modal-header-right">
+        <button class="artifact-modal-btn" id="artifact-modal-refresh" title="Muat Ulang">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><polyline points="21 3 21 8 16 8"/></svg>
+          <span>Refresh</span>
+        </button>
+        <button class="artifact-modal-btn" id="artifact-modal-copy" title="Salin Kode">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="13" height="13" x="9" y="9" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span>Copy Kode</span>
+        </button>
+        <button class="modal-close" id="artifact-modal-close" aria-label="Tutup">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="artifact-modal-body" id="artifact-modal-body"></div>
+  </div>
+</div>
+
+<!-- ===== IMAGE LIGHTBOX MODAL ===== -->
+<div class="image-lightbox-overlay" id="image-lightbox-overlay" style="display:none;">
+  <div class="image-lightbox-container" id="image-lightbox-container">
+    <div class="image-lightbox-header">
+      <div class="lightbox-header-left">
+        <span class="lightbox-prompt-text" id="lightbox-prompt-text">Preview Gambar</span>
+      </div>
+      <div class="lightbox-actions">
+        <a id="lightbox-download-link" href="#" download="" class="lightbox-btn" target="_blank" title="Unduh Gambar Resolusi Penuh">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span>Download</span>
+        </a>
+        <button id="lightbox-close-btn" class="lightbox-btn close-btn" aria-label="Tutup" title="Tutup">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="image-lightbox-body" id="image-lightbox-body">
+      <img id="lightbox-img" src="" alt="Fullscreen view">
+    </div>
+  </div>
+</div>
+
+<!-- ===== FLOATING REMOTE SERVER WINDOW (OWNER ONLY) ===== -->
+<div id="server-floating-window" class="server-floating-window" style="display:none;">
+  <!-- Header (Draggable) -->
+  <div class="server-window-header" id="server-window-header">
+    <div class="server-window-title-wrap">
+      <div class="server-window-icon-box">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+      </div>
+      <div class="server-window-title">
+        <span id="server-window-title-text">Server Host (24/7)</span>
+        <span class="server-window-status-text" id="label-server-badge">online</span>
+      </div>
+    </div>
+    <div class="server-window-actions">
+      <button type="button" class="btn-server-win-close" id="btn-close-server-win" title="Tutup / Minimize">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Body 1: Minimalist Health Strip (Compact Single Row without emojis) -->
+  <div class="server-window-stats-compact">
+    <div class="server-compact-metric" id="card-server-temp" title="Suhu CPU / GPU">
+      <span class="compact-metric-label">temp</span>
+      <span class="compact-metric-val" id="val-server-temp">—°C</span>
+      <span class="compact-metric-sub" id="sub-server-temp">Aman</span>
+    </div>
+    <div class="server-compact-metric" id="card-server-bat" title="Baterai & Daya Charger AC">
+      <span class="compact-metric-label">battery</span>
+      <span class="compact-metric-val" id="val-server-bat">—%</span>
+      <span class="compact-metric-sub compact-sub-green" id="sub-server-bat">AC</span>
+    </div>
+    <div class="server-compact-metric" id="card-server-ram" title="RAM Server (4GB)">
+      <span class="compact-metric-label">ram</span>
+      <span class="compact-metric-val" id="val-server-ram">— GB</span>
+    </div>
+    <div class="server-compact-metric" id="card-server-uptime" title="Uptime Server">
+      <span class="compact-metric-label">uptime</span>
+      <span class="compact-metric-val" id="val-server-uptime">—</span>
+    </div>
+  </div>
+
+  <!-- Alert Banner (shown when battery discharging or temp > 75°C) -->
+  <div class="server-alert-banner" id="server-alert-banner" style="display:none;">
+    <svg class="alert-icon-svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span id="server-alert-banner-text">Peringatan Server</span>
+  </div>
+
+  <!-- Body 2: Mini Chat Server DevOps (Expanded) -->
+  <div class="server-window-chat">
+    <div class="server-chat-bar-info">
+      <span>● sesi: server_devops</span>
+    </div>
+    <div class="server-chat-history" id="server-chat-history">
+      <div class="server-chat-bubble server-chat-bot">
+        <div class="server-chat-avatar">S</div>
+        <div class="server-chat-text">Halo Bos Ikhsan! Gw Sanfa Server Monitor. Ada yang mau dicek atau di-restart di server HP atau laptop?</div>
+      </div>
+    </div>
+    <!-- Quick Action Pills (No emojis, clean text) -->
+    <div class="server-chat-pills">
+      <button type="button" class="btn-server-pill" id="btn-quick-suhu">Cek Suhu & CPU</button>
+      <button type="button" class="btn-server-pill" id="btn-quick-ram">Clean RAM</button>
+      <button type="button" class="btn-server-pill" id="btn-quick-tunnel">Restart Tunnel</button>
+    </div>
+    <!-- Mini Chat Input -->
+    <div class="server-chat-input-row">
+      <input type="text" id="server-chat-input" placeholder="Tanya server atau ketik /clear..." autocomplete="off" />
+      <button type="button" id="btn-send-server-chat" class="btn-server-chat-send">Kirim</button>
+    </div>
+  </div>
+
+  <!-- Resize Grip Indicator -->
+  <div class="server-resize-grip" title="Resize jendela">
+    <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor">
+      <circle cx="7" cy="1" r="0.8"/>
+      <circle cx="7" cy="4" r="0.8"/>
+      <circle cx="7" cy="7" r="0.8"/>
+      <circle cx="4" cy="4" r="0.8"/>
+      <circle cx="4" cy="7" r="0.8"/>
+      <circle cx="1" cy="7" r="0.8"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ===== MANUAL BOOK MODAL (BUKU PANDUAN PENGGUNA) ===== -->
+<div class="modal-overlay" id="manual-book-modal-overlay" style="display:none;">
+  <div class="modal-panel manual-book-modal-panel">
+    <div class="modal-header">
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent)">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+        <span class="modal-title">Buku Panduan Sanfa Agent</span>
+      </div>
+      <button class="modal-close" id="manual-book-modal-close" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Manual Book Tabs -->
+    <div class="manual-book-tabs">
+      <button class="manual-book-tab-btn active" data-tab="manual-slash">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Perintah Slash (/)
+      </button>
+      <button class="manual-book-tab-btn" data-tab="manual-bridge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        Pasang Sanfa Bridge
+      </button>
+      <button class="manual-book-tab-btn" data-tab="manual-persona">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Kloning WhatsApp
+      </button>
+    </div>
+
+    <div class="manual-book-body">
+      <!-- TAB 1: PERINTAH SLASH -->
+      <div class="manual-book-pane active" id="manual-pane-slash">
+        <div class="manual-intro-card">
+          <div class="manual-intro-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f7b06d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Perintah Cepat (Slash Commands)</div>
+          <div class="manual-intro-desc">Ketik karakter <code>/</code> pada kolom obrolan untuk memunculkan menu pintasan otomatis. Berikut daftar perintah yang siap digunakan:</div>
+        </div>
+
+        <div class="manual-table-wrap">
+          <table class="manual-table">
+            <thead>
+              <tr>
+                <th style="width:38%;">Perintah</th>
+                <th>Fungsi &amp; Contoh Penggunaan</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>/prefer [aturan]</code></td>
+                <td>Melatih memori jangka panjang AI tentang aturan atau preferensimu.<br><span class="manual-example">Contoh: <code>/prefer selalu jawab singkat dan padat</code></span></td>
+              </tr>
+              <tr>
+                <td><code>/panggilan [nama]</code></td>
+                <td>Mengubah nama panggilan akrab yang dipakai AI untuk menyapamu.<br><span class="manual-example">Contoh: <code>/panggilan Bang Ikhsan</code></span></td>
+              </tr>
+              <tr>
+                <td><code>/imagine [prompt]</code></td>
+                <td>Menghasilkan gambar ilustrasi AI menggunakan Google Imagen 3.<br><span class="manual-example">Contoh: <code>/imagine pemandangan senja cyberpunk</code></span></td>
+              </tr>
+              <tr>
+                <td><code>/model [nama]</code></td>
+                <td>Mengganti model AI yang aktif tanpa perlu membuka modal picker.<br><span class="manual-example">Contoh: <code>/model claude-3-5-sonnet</code></span></td>
+              </tr>
+              <tr>
+                <td><code>/clear</code></td>
+                <td>Membersihkan riwayat percakapan sesi ini untuk memulai topik baru.</td>
+              </tr>
+              <tr>
+                <td><code>/help</code></td>
+                <td>Menampilkan daftar perintah dan tombol bantuan cepat di jendela chat.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 2: PANDUAN PASANG BRIDGE (DENGAN MOCKUP VISUAL BERPENUNJUK) -->
+      <div class="manual-book-pane" id="manual-pane-bridge">
+        <div class="manual-intro-card">
+          <div class="manual-intro-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f7b06d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Menghubungkan Laptop ke Sanfa Agent</div>
+          <div class="manual-intro-desc">Dengan Sanfa Bridge aktif, AI bisa membaca hardware laptop (RAM &amp; Baterai), mengontrol mouse/keyboard, dan menjalankan instruksi terminal secara langsung.</div>
+        </div>
+
+        <!-- Visual Mockup Berpenunjuk -->
+        <div class="manual-mockup-wrap">
+          <div class="manual-mockup-header">
+            <span class="manual-mockup-dot red"></span>
+            <span class="manual-mockup-dot yellow"></span>
+            <span class="manual-mockup-dot green"></span>
+            <span class="manual-mockup-title">Visual Panduan — Interface Sanfa Bridge</span>
+          </div>
+          <div class="manual-mockup-content">
+            <!-- Callout 1 -->
+            <div class="manual-callout-item">
+              <div class="manual-callout-badge badge-amber">TANDA 1</div>
+              <div class="manual-callout-box">
+                <div class="manual-callout-heading">Pilih Tab "Desktop App" (Sangat Disarankan)</div>
+                <div class="manual-callout-text">Di tab <strong>Pengaturan &rarr; Bridge</strong>, klik tombol <strong>Desktop App</strong>. Cukup download <code>Sanfa-Agent-Setup.exe (~89 MB)</code> dan dobel-klik untuk memasang. Tanpa perlu install Node.js!</div>
+              </div>
+            </div>
+
+            <!-- Callout 2 -->
+            <div class="manual-callout-item">
+              <div class="manual-callout-badge badge-blue">TANDA 2</div>
+              <div class="manual-callout-box">
+                <div class="manual-callout-heading">Otentikasi Token Otomatis</div>
+                <div class="manual-callout-text">Saat aplikasi desktop dibuka dan kamu login dengan username &amp; passwordmu, Bridge token di laptopmu akan <strong>otomatis disinkronkan</strong> tanpa perlu salin-tempel kode manual.</div>
+              </div>
+            </div>
+
+            <!-- Callout 3 -->
+            <div class="manual-callout-item">
+              <div class="manual-callout-badge badge-green">TANDA 3</div>
+              <div class="manual-callout-box">
+                <div class="manual-callout-heading">Indikator Lampu Hijau "Bridge Terhubung"</div>
+                <div class="manual-callout-text">Perhatikan kartu status atas: saat lampu dot menyala hijau dengan status <code>Bridge Terhubung: Laptop-Nama</code>, artinya laptopmu sudah 100% online dan siap menerima perintah!</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="manual-tip-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f7b06d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:2px;"><line x1="9" y1="18" x2="15" y2="18"/><line x1="10" y1="22" x2="14" y2="22"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+          <div><strong>Tips Tambahan (Bagi Pengguna Terminal):</strong> Kamu juga bisa menjalankan perintah 1-baris PowerShell di tab <strong>Terminal</strong> jika laptopmu sudah terpasang Node.js LTS.</div>
+        </div>
+      </div>
+
+      <!-- TAB 3: KLONING PERSONA WHATSAPP -->
+      <div class="manual-book-pane" id="manual-pane-persona">
+        <div class="manual-intro-card">
+          <div class="manual-intro-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f7b06d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:6px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Kloning Persona dari WhatsApp</div>
+          <div class="manual-intro-desc">Sanfa Agent bisa mempelajari rekaman obrolan WhatsApp untuk menduplikasi gaya bicara, slang, lelucon khas, dan memori masa lalu kontak yang kamu inginkan.</div>
+        </div>
+
+        <!-- 4 Langkah Visual Berpenunjuk -->
+        <div class="manual-steps-list">
+          <div class="manual-step-row">
+            <div class="manual-step-number">1</div>
+            <div class="manual-step-info">
+              <div class="manual-step-title">Buka Chat di Aplikasi WhatsApp HP</div>
+              <div class="manual-step-desc">Buka percakapan obrolan (pribadi atau grup) dengan orang yang ingin kamu tiru kepribadiannya di aplikasi WhatsApp Android atau iPhone kamu.</div>
+            </div>
+          </div>
+
+          <div class="manual-step-row">
+            <div class="manual-step-number">2</div>
+            <div class="manual-step-info">
+              <div class="manual-step-title">Buka Menu "Ekspor Chat" (Export Chat)</div>
+              <div class="manual-step-desc">Ketuk menu <strong>titik tiga (&vellip;)</strong> di pojok kanan atas layar obrolan &rarr; ketuk <strong>Lainnya (More)</strong> &rarr; pilih <strong>Ekspor Chat (Export Chat)</strong>.</div>
+            </div>
+          </div>
+
+          <div class="manual-step-row highlight">
+            <div class="manual-step-number" style="background:#f59e0b;color:#000;">3</div>
+            <div class="manual-step-info">
+              <div class="manual-step-title" style="color:#ffd8a8;">PENTING: Pilih Opsi "Tanpa Media" (Without Media)</div>
+              <div class="manual-step-desc">WhatsApp akan menanyakan apakah ingin menyertakan media. <strong>Wajib pilih 'Tanpa Media'</strong> agar menghasilkan berkas teks <code>.txt</code> atau <code>.zip</code> yang ringan, bersih, dan cepat diproses oleh AI.</div>
+            </div>
+          </div>
+
+          <div class="manual-step-row">
+            <div class="manual-step-number">4</div>
+            <div class="manual-step-info">
+              <div class="manual-step-title">Upload &amp; Mulai Roleplay di Sanfa Agent</div>
+              <div class="manual-step-desc">Kirim berkas <code>.txt</code> tersebut ke laptopmu, lalu di Sanfa Agent klik tombol <strong>Persona WA</strong> di topbar &rarr; upload berkas &rarr; klik <strong>Generate Kloning</strong>. Aktifkan sakelar Roleplay, dan Sanfa akan berbicara persis seperti kontak tersebut!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

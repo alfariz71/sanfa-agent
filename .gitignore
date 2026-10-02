@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+dist/
+
+# Environment & Credentials
+.env
+auth_sessions.json
+blocked_devices.json
+users.json
+user_profiles.json
+chat_memory.json
+
+# Logs & Debug
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# OS & Temp
+.DS_Store
+Thumbs.db
+screenshots/
+*.exe
+*.zip

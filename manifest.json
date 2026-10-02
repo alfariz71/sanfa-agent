@@ -1,0 +1,23 @@
+{
+  "name": "Sanfa Agent",
+  "short_name": "Sanfa",
+  "description": "Autonomous AI Agent & Desktop Assistant",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#110a06",
+  "theme_color": "#110a06",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "1920x1920",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    }
+  ]
+}
